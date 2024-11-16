@@ -5,9 +5,11 @@ import { googleoauth } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/login", show_session, googleoauth, login);
-router.post("/signup", show_session, googleoauth, signup);
-router.post("/logout", show_session, logout);
-router.post("/loginstatus", show_session, loginStatus);
+router.use(show_session);
+
+router.post("/login", googleoauth, login);
+router.post("/signup", googleoauth, signup);
+router.post("/logout", logout);
+router.post("/loginstatus", loginStatus);
 
 export default router;

@@ -24,6 +24,9 @@ const googleoauth = async (req, res, next) => {
 			return res.json({ error: er });
 		}
 	}
+	else {
+		return res.json({ error: "something went wrong", body: req.body });
+	}
 }
 
 export { googleoauth };

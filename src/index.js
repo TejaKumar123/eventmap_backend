@@ -8,6 +8,7 @@ import router from "../src/routes/index.js"
 import session from "express-session"
 import redisConnect, { redisClient } from "./config/redisConfig.js"
 import RedisStore from "connect-redis"
+import morgan from "morgan"
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -33,6 +34,7 @@ app.use(session({
 		secure: false
 	}
 }))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
 app.use(router);
 
