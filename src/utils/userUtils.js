@@ -11,13 +11,16 @@ const finduser = async (req, callback) => {
 				UserOperations.find(criteria, (err, result) => {
 					if (err) {
 						triggercallback(true, {
+							status: "error",
 							error: result,
-							message: "error occured while fetching users"
 						});
 
 					}
 					else {
-						triggercallback(null, result);
+						triggercallback(null, {
+							status: "ok",
+							data: result
+						});
 
 					}
 				})
@@ -31,6 +34,7 @@ const finduser = async (req, callback) => {
 	}
 	else {
 		callback(true, {
+			status: "error",
 			message: "error occured while fetching users"
 		})
 	}
