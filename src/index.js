@@ -36,12 +36,14 @@ app.use(session({
 	}
 }))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
+app.use((req, res, next) => {
+	next();
+})
 
 app.use(router);
 
-app.get("/", show_req, (req, res) => {
-	req.session.sessionid = req.sessionID;
-	return res.status(201).json({ req: req.session, sessionid: req.sessionID });
+app.get("/", (req, res) => {
+	res.json("successfully working");
 })
 
 app.listen(PORT, (req, res) => {

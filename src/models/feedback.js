@@ -5,6 +5,10 @@ const feedbackSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		required: true,
 	},
+	feedback_id: {
+		type: String,
+		required: true
+	},
 	email: {
 		type: String,
 		required: true,
