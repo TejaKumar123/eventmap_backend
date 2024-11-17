@@ -1,14 +1,23 @@
 import UserOperations from "../operations/userOperations.js";
 import async from "async";
 
-const finduser = async (req, callback) => {
+/* 
+* @route - /user/findUser
+* @params - criteria, projectio as objects
+* @desc - user - util - find
+*/
+
+const find = async (req, callback) => {
 	let { body } = req;
-	let criteria = {};
-	if (body && body.role) {
-		criteria.role = body.role;
+
+	if (body && body.criteria) {
+
+		let criteria = body.criteria || {};
+		let projection = body.projection || {};
+
 		async.waterfall([
 			function (triggercallback) {
-				UserOperations.find(criteria, (err, result) => {
+				UserOperations.find(criteria, projection, (err, result) => {
 					if (err) {
 						triggercallback(true, {
 							status: "error",
@@ -40,6 +49,6 @@ const finduser = async (req, callback) => {
 	}
 }
 
-const userUtils = { finduser };
+const userUtils = { find };
 
 export default userUtils;
