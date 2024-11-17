@@ -9,6 +9,7 @@ import session from "express-session"
 import redisConnect, { redisClient } from "./config/redisConfig.js"
 import RedisStore from "connect-redis"
 import morgan from "morgan"
+import moment from "moment"
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -44,5 +45,10 @@ app.get("/", show_req, (req, res) => {
 })
 
 app.listen(PORT, (req, res) => {
-	console.log(`Server running at http://localhost:${PORT}`)
+	console.log(`Server running at http://localhost:${PORT}`);
+	// let momentobj = moment();
+	// let test = momentobj.format("YYYY-MM-DD hh:mm:ss a");
+	// console.log(momentobj.format("YYYY-MM-DD hh:mm:ss a"));
+	// console.log(moment("2024-11-25T03:10:00.000Z").format());
+	// console.log(momentobj.format());
 });

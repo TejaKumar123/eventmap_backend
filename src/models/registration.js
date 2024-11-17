@@ -5,6 +5,10 @@ const registrationSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		required: true,
 	},
+	registration_id: {
+		type: "String",
+		required: true,
+	},
 	email: {
 		type: String,
 		required: true,
