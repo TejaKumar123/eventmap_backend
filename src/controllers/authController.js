@@ -15,6 +15,14 @@ const login = async (req, res) => {
 	}
 	else if (type == "normal") {
 		try {
+
+			if (req.session?.login == true) {
+				return res.json({
+					status: "ok",
+					message: "You are already login",
+				});
+			}
+
 			const { email, password } = req.body;
 			const tempuser = await User.find({ email });
 			if (tempuser.length == 0) {

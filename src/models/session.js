@@ -14,6 +14,7 @@ const sessionSchema = new Schema({
 		type: Schema.Types.String,
 		required: true,
 	},
+	//email from user model only
 	session_name: {
 		type: String,
 		required: true,
@@ -30,6 +31,7 @@ const sessionSchema = new Schema({
 		type: Number,
 		required: true,
 	},
+	// status have values 1 for session complete and 0 for still have to complete
 	session_image: {
 		type: String,
 		required: true,
@@ -47,6 +49,7 @@ const sessionSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	// acceptance has 1 for completion and 0 for pending and -1 for rejection
 	updated_at: {
 		type: Date,
 		required: true,

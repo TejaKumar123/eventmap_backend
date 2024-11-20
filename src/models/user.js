@@ -16,15 +16,18 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		minlength: 8,
 	},
+	//password is hashed password using bcrypt
 	role: {
 		type: String,
 		required: true,
 		default: "participant",
 	},
+	//role values are admin,participant,speaker
 	type: {
 		type: String,
 		default: "normal"
 	},
+	//types are google, normal
 	profileimage: {
 		type: String,
 	},

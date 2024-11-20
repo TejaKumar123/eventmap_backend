@@ -13,10 +13,12 @@ const registrationSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	// email from user model only
 	session_id: {
 		type: String,
 		required: true,
 	},
+	//session_id from from session model only
 	date_time: {
 		type: Date,
 		required: true,
