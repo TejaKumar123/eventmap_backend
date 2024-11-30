@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		minlength: 8,
 	},
+	username: {
+		type: String,
+		required: true,
+	},
 	//password is hashed password using bcrypt
 	role: {
 		type: String,
@@ -30,6 +34,7 @@ const userSchema = new mongoose.Schema({
 	//types are google, normal
 	profileimage: {
 		type: String,
+		default: null,
 	},
 	dateOfBirth: {
 		type: Date,

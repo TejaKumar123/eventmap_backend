@@ -3,7 +3,7 @@ import async from "async";
 
 /* 
 * @route - /user/findUser
-* @params - criteria, projectio as objects
+* @params - criteria, projection as objects
 * @desc - user - util - find
 */
 

@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import AuthenticationUtil from "../utils/authenticationUtil.js";
 import { hashPassword, comparePassword } from "../utils/password.js";
 
 /*
@@ -103,31 +104,23 @@ const signup = async (req, res) => {
 */
 
 const logout = (req, res) => {
-	req.session.destroy((er) => {
-		if (er) {
-			return res.status(400).json({ status: "rejected", message: "something went wrong while logout", error: er })
-		}
-		res.json({ status: "ok", message: "Logout successfully" })
+	AuthenticationUtil.logout(req, (err, result) => {
+		res.json(result);
 	})
 }
 
 /*
 * @route - POST auth/loginStatus
 * @params - no params
-* @return - send user data , login is true or false , sessoid is optional. if error send error with some message
+* @return - send user data , login is true or false , sessonid is optional. if error send error with some message
 * @desc - Login controller
 */
 
 const loginStatus = (req, res) => {
-	try {
-		if (req?.session?.login) {
-			return res.status(201).send({ status: "ok", login: true, user: req.session.user, sessionid: req.sessionID });
-		}
-		return res.status(201).send({ status: "ok", login: false });
-	}
-	catch (er) {
-		return res.status(400).send({ status: "rejected", message: "error while getting login status", error: er })
-	}
+	AuthenticationUtil.loginStatus(req, (err, result) => {
+		res.json(result);
+	})
 }
 
-export { login, signup, logout, loginStatus };
+const authController = { login, signup, logout, loginStatus };
+export default authController;
