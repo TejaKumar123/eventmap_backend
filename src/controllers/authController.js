@@ -10,7 +10,10 @@ import { hashPassword, comparePassword } from "../utils/password.js";
 */
 
 const login = async (req, res) => {
-	const { type } = req.body;
+	AuthenticationUtil.login(req, (err, result) => {
+		return res.json(result);
+	})
+	/* const { type } = req.body;
 	if (type == "google") {
 		//code further;
 	}
@@ -50,7 +53,7 @@ const login = async (req, res) => {
 	}
 	else {
 		return res.status(201).json({ status: "rejected", message: "Invalid login type" })
-	}
+	} */
 }
 
 /*
