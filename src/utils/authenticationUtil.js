@@ -27,7 +27,7 @@ const login = async (req, callback) => {
 		if (body?.type == "google") {
 			if (body?.code) {
 				let { tokens } = await oauth2Client.getToken(body.code);
-				console.log(tokens);
+				/* console.log(tokens); */
 				oauth2Client.setCredentials(tokens);
 				let userInfo = await google.oauth2("v2").userinfo.get({ auth: oauth2Client });
 				body.email = userInfo.data.email;
