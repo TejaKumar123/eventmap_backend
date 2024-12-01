@@ -222,11 +222,11 @@ const signup = async (req, callback) => {
 							}
 							else {
 								req.session.login = true;
-								req.session.user = result;
+								req.session.user = result[0];
 								triggercallback(null, {
 									status: "ok",
 									message: "signup successfully with google",
-									user: result,
+									user: result[0],
 								});
 							}
 						})
@@ -236,7 +236,7 @@ const signup = async (req, callback) => {
 						let hashedpassword = hashPassword(body.password);
 						let userInfo = { email: body.email, password: hashedpassword, username: body.username, name: body.username };
 						/* console.log(userInfo); */
-						UserOperations.insertMany(userInfo, (err, result) => {
+						UserOperations.insertMany([userInfo], (err, result) => {
 							if (err) {
 								triggercallback(true, {
 									status: "error",
@@ -246,11 +246,11 @@ const signup = async (req, callback) => {
 							}
 							else {
 								req.session.login = true;
-								req.session.user = result;
+								req.session.user = result[0];
 								triggercallback(null, {
 									status: "ok",
 									message: "signup successfully",
-									user: result,
+									user: result[0],
 								})
 							}
 						})
