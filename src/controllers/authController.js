@@ -12,48 +12,7 @@ import { hashPassword, comparePassword } from "../utils/password.js";
 const login = async (req, res) => {
 	AuthenticationUtil.login(req, (err, result) => {
 		return res.json(result);
-	})
-	/* const { type } = req.body;
-	if (type == "google") {
-		//code further;
-	}
-	else if (type == "normal") {
-		try {
-
-			if (req.session?.login == true) {
-				return res.json({
-					status: "ok",
-					message: "You are already login",
-				});
-			}
-
-			const { email, password } = req.body;
-			const tempuser = await User.find({ email });
-			if (tempuser.length == 0) {
-				return res.status(201).json({ status: "rejected", message: "User is not registerd" });
-			}
-			else if (tempuser.length == 1) {
-				const password_match = await comparePassword(password, tempuser[0].password);
-				if (password_match) {
-					req.session.user = tempuser[0];
-					req.session.login = true;
-					return res.status(201).json({ status: "ok", message: "Login successfully", user: tempuser[0] })
-				}
-				else {
-					return res.status(201).json({ status: "rejected", message: "Password is not matched" })
-				}
-			}
-			else {
-				return res.status(201).json({ status: "rejected", message: "something went wrong while password verification.Please try again", user: tempuser })
-			}
-		}
-		catch (er) {
-			return res.status(201).json({ status: "rejected", message: "something went wrong.Please try again", error: er })
-		}
-	}
-	else {
-		return res.status(201).json({ status: "rejected", message: "Invalid login type" })
-	} */
+	});
 }
 
 /*
@@ -64,7 +23,10 @@ const login = async (req, res) => {
 */
 
 const signup = async (req, res) => {
-	const { type } = req.body;
+	AuthenticationUtil.signup(req, (err, result) => {
+		return res.json(result);
+	})
+	/* const { type } = req.body;
 	if (type == "google") {
 		//code further
 	}
@@ -96,7 +58,7 @@ const signup = async (req, res) => {
 	}
 	else {
 		return res.status(201).json({ status: "rejected", message: "invalid type" })
-	}
+	} */
 }
 
 /*

@@ -2,6 +2,13 @@ import async from "async";
 import { hashPassword, comparePassword } from "./password.js";
 import UserOperations from "../operations/userOperations.js";
 
+/*
+* @route - POST /auth/login
+* @params - type,email,password
+* @return - if login successfully send and store user data in session store, login is true, status is ok. if any error send error with error message.
+* @desc - Login - util
+*/
+
 const login = async (req, callback) => {
 	const { body } = req;
 
@@ -61,7 +68,7 @@ const login = async (req, callback) => {
 							user: data,
 						})
 					}
-					else if (body?.type == "normal") {
+					else if (body?.type == "normal" && body?.password) {
 						let flag = comparePassword(body?.password, data?.password);
 						if (flag) {
 							req.session.login = true;
@@ -82,7 +89,7 @@ const login = async (req, callback) => {
 					else {
 						triggercallback(true, {
 							status: "error",
-							message: "authentication type not matched",
+							message: "authentication type not matched or invalid details",
 						})
 					}
 				}
@@ -112,7 +119,123 @@ const login = async (req, callback) => {
 
 }
 
+/*
+* @route - POST /auth/signup
+* @params - type,email,password,username or "code" for google
+* @return - if signup successfully status is ok, send and store user data in session store , send login is true. if any error send error message
+* @desc - Signup - util
+*/
+
 const signup = async (req, callback) => {
+	const { body } = req;
+	try {
+		if (body?.type == "google") {
+			if (body?.code) {
+
+			}
+			else {
+				callback(null, {
+					status: "error",
+					message: "invalid details",
+				});
+				return;
+			}
+		}
+
+		if (body.email && body?.username) {
+			async.waterfall([
+				function (triggercallback) {
+					//checking email is present or not
+					UserOperations.find({ email: body.email }, {}, (err, result) => {
+						if (err) {
+							triggercallback(true, { status: "error", message: "error occured" });
+						}
+						else {
+							if (result.length != 0) {
+								triggercallback(true, {
+									status: "error",
+									message: "email already registered",
+								})
+							}
+							else {
+								triggercallback(null, result);
+							}
+						}
+					})
+				},
+				function (data, triggercallback) {
+					//checking username is present or not.
+					UserOperations.find({ username: body.username }, {}, (err, result) => {
+						if (err) {
+							triggercallback(true, { status: "error", message: "error occured", error: result });
+						}
+						else {
+							if (result.length != 0) {
+								triggercallback(true, {
+									status: "error",
+									message: "username already present",
+								})
+							}
+							else {
+								triggercallback(null, data);
+							}
+						}
+					})
+				},
+				function (data, triggercallback) {
+					if (body?.type == "google") {
+
+					}
+					else if (body?.type == "normal" && body?.password) {
+						let hashedpassword = hashPassword(body.password);
+						let userInfo = { email: body.email, password: hashedpassword, username: body.username, name: body.username };
+						/* console.log(userInfo); */
+						UserOperations.insertMany(userInfo, (err, result) => {
+							if (err) {
+								triggercallback(true, {
+									status: "error",
+									error: result,
+									message: "error while registering"
+								})
+							}
+							else {
+								req.session.login = true;
+								req.session.user = result;
+								triggercallback(null, {
+									status: "ok",
+									message: "signup successfully",
+									user: result,
+								})
+							}
+						})
+					}
+					else {
+						triggercallback(true, {
+							status: "error",
+							message: "authentication type not found or invalid details."
+						})
+					}
+				}
+			],
+				function (err, result) {
+					callback(err, result);
+					return;
+				}
+			)
+		}
+		else {
+			callback(true, { status: "error", message: "invalid details" });
+			return;
+		}
+	}
+	catch (err) {
+		callback(true, {
+			status: "error",
+			error: err,
+			message: "error occured",
+		});
+		return;
+	}
 
 }
 
