@@ -18,7 +18,7 @@ const login = async (req, callback) => {
 
 		if (req.session.login == true) {
 			callback(null, {
-				status: "ok",
+				status: "error",
 				message: "already one account login",
 			})
 			return;
@@ -27,6 +27,7 @@ const login = async (req, callback) => {
 		if (body?.type == "google") {
 			if (body?.code) {
 				let { tokens } = await oauth2Client.getToken(body.code);
+				console.log(tokens);
 				oauth2Client.setCredentials(tokens);
 				let userInfo = await google.oauth2("v2").userinfo.get({ auth: oauth2Client });
 				body.email = userInfo.data.email;
@@ -134,6 +135,15 @@ const login = async (req, callback) => {
 const signup = async (req, callback) => {
 	const { body } = req;
 	try {
+
+		if (req?.session?.login == true) {
+			callback(true, {
+				status: "error",
+				message: "already one account logined"
+			});
+			return;
+		}
+
 		if (body?.type == "google") {
 			if (body?.code) {
 				let { tokens } = await oauth2Client.getToken(body.code);
