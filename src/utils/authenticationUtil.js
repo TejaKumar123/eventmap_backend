@@ -1,6 +1,8 @@
 import async from "async";
 import { hashPassword, comparePassword } from "./password.js";
 import UserOperations from "../operations/userOperations.js";
+import oauth2Client from "../config/googleConfig.js";
+import { google } from "googleapis";
 
 /*
 * @route - POST /auth/login
@@ -24,7 +26,10 @@ const login = async (req, callback) => {
 
 		if (body?.type == "google") {
 			if (body?.code) {
-
+				let { tokens } = await oauth2Client.getToken(body.code);
+				oauth2Client.setCredentials(tokens);
+				let userInfo = await google.oauth2("v2").userinfo.get({ auth: oauth2Client });
+				body.email = userInfo.data.email;
 			}
 			else {
 				callback(true, { status: "error", message: "invalid details." });
@@ -32,7 +37,7 @@ const login = async (req, callback) => {
 			}
 		}
 
-		if (body.email && body.password && body.type) {
+		if (body.email && body.type) {
 			async.waterfall([
 				function (triggercallback) {
 					let criteria = { email: body.email, type: body.type };
@@ -131,7 +136,12 @@ const signup = async (req, callback) => {
 	try {
 		if (body?.type == "google") {
 			if (body?.code) {
-
+				let { tokens } = await oauth2Client.getToken(body.code);
+				oauth2Client.setCredentials(tokens);
+				let userInfo = await google.oauth2("v2").userinfo.get({ auth: oauth2Client });
+				body.email = userInfo.data.email;
+				body.username = userInfo?.data?.name + userInfo.data.id;
+				body.userInfo = userInfo.data;
 			}
 			else {
 				callback(null, {
@@ -184,6 +194,32 @@ const signup = async (req, callback) => {
 				},
 				function (data, triggercallback) {
 					if (body?.type == "google") {
+						let userInfo = {
+							name: body.userInfo.name,
+							email: body.userInfo.email,
+							type: "google",
+							username: body.username,
+							profileimage: body.userInfo.picture,
+						}
+
+						UserOperations.insertMany([userInfo], (err, result) => {
+							if (err) {
+								triggercallback(true, {
+									status: "error",
+									message: "error while signup",
+									error: result,
+								})
+							}
+							else {
+								req.session.login = true;
+								req.session.user = result;
+								triggercallback(null, {
+									status: "ok",
+									message: "signup successfully with google",
+									user: result,
+								});
+							}
+						})
 
 					}
 					else if (body?.type == "normal" && body?.password) {
@@ -232,7 +268,7 @@ const signup = async (req, callback) => {
 		callback(true, {
 			status: "error",
 			error: err,
-			message: "error occured",
+			message: "error occured.",
 		});
 		return;
 	}
