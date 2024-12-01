@@ -239,6 +239,13 @@ const signup = async (req, callback) => {
 
 }
 
+/*
+* @route - POST auth/logout
+* @params - no params
+* @return - send message "Logout successfully" if logout else send error message with some message
+* @desc - Logout - util
+*/
+
 const logout = async (req, callback) => {
 	try {
 		req.session.destroy((err) => {
@@ -265,6 +272,13 @@ const logout = async (req, callback) => {
 		})
 	}
 }
+
+/*
+* @route - POST auth/loginStatus
+* @params - no params
+* @return - send user data , login is true or false , sessonid is optional. if error send error with some message
+* @desc - LoginStatus - util
+*/
 
 const loginStatus = async (req, callback) => {
 	try {
