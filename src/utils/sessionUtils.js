@@ -151,7 +151,7 @@ const deleteOne = async (req, callback) => {
 	const { body } = req;
 
 	if (body && body.session_id) {
-		let criteria = { session_id: body.session_id };
+		let criteria = { session_id: body.session_id,...body.criteria };
 		async.waterfall([
 			function (triggercallback) {
 				sessionOperations.deleteOne(criteria, (err, result) => {
