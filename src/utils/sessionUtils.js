@@ -50,7 +50,7 @@ const insertOne = async (req, callback) => {
 					else {
 						triggercallback(err, {
 							status: "ok",
-							data: result,
+							data: result[0],
 						});
 					}
 				})
@@ -91,7 +91,7 @@ const find = async (req, callback) => {
 						});
 					}
 					else {
-						triggercallback(err, {
+						triggercallback(null, {
 							status: "ok",
 							data: result,
 						});
@@ -151,7 +151,7 @@ const deleteOne = async (req, callback) => {
 	const { body } = req;
 
 	if (body && body.session_id) {
-		let criteria = { session_id: body.session_id,...body.criteria };
+		let criteria = { session_id: body.session_id, ...body.criteria };
 		async.waterfall([
 			function (triggercallback) {
 				sessionOperations.deleteOne(criteria, (err, result) => {
