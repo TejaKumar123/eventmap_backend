@@ -3,6 +3,7 @@ import { hashPassword, comparePassword } from "./password.js";
 import UserOperations from "../operations/userOperations.js";
 import oauth2Client from "../config/googleConfig.js";
 import { google } from "googleapis";
+/* import { Readable } from "stream"; */
 
 /*
 * @route - POST /auth/login
@@ -31,6 +32,42 @@ const login = async (req, callback) => {
 				oauth2Client.setCredentials(tokens);
 				let userInfo = await google.oauth2("v2").userinfo.get({ auth: oauth2Client });
 				body.email = userInfo.data.email;
+
+				///testing drive start
+				/* let drive = google.drive({ version: "v3", auth: oauth2Client })
+
+				try {
+					// File metadata
+					const fileMetadata = {
+						name: `random-file-${Date.now()}.txt`, // Randomized file name
+						mimeType: 'text/plain',
+					};
+					// Generate random content and convert it into a readable stream
+					const randomContent = `This is a random file created at ${new Date().toISOString()}`;
+					const readableStream = Readable.from(randomContent); // Convert string to stream
+					const media = {
+						mimeType: 'text/plain',
+						body: readableStream, // Pass the readable stream here
+					};
+
+					const response1 = await drive.files.create({
+						requestBody: fileMetadata,
+						media: media,
+						fields: 'id', // Get the file ID in the response
+					});
+					console.log({ response1: response1?.data?.id });
+
+					let response = await drive.files.list();
+					console.log({ response: JSON.stringify(response.data.files) });
+
+				}
+				catch (err) {
+					console.log({ error: err });
+				} */
+
+
+				///testing drive end
+
 			}
 			else {
 				callback(true, { status: "error", message: "invalid details." });
