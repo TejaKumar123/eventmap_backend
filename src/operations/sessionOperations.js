@@ -15,11 +15,10 @@ const updateOne = async (criteria, updateInfo, callback) => {
 	try {
 		let res = await Session.updateOne(criteria, updateInfo);
 		callback(null, res);
+		return;
 	}
 	catch (err) {
-		callback(true, {
-			message: "error while updatating the session"
-		});
+		callback(true, err);
 		return;
 	}
 }
@@ -28,11 +27,10 @@ const find = async (criteria, projection, callback) => {
 	try {
 		let res = await Session.find(criteria, projection);
 		callback(null, res);
+		return;
 	}
 	catch (err) {
-		callback(true, {
-			message: "error occured while fetching data"
-		});
+		callback(true, err);
 		return;
 	}
 }
@@ -41,11 +39,10 @@ const deleteOne = async (criteria, callback) => {
 	try {
 		let res = await Session.deleteOne(criteria);
 		callback(null, res);
+		return;
 	}
 	catch (err) {
-		callback(true, {
-			message: "error while deleting the session"
-		});
+		callback(true, err);
 	}
 }
 

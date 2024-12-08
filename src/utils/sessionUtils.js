@@ -2,6 +2,7 @@ import moment from "moment";
 import { ObjectId } from "mongodb";
 import sessionOperations from "../operations/sessionOperations.js";
 import async from "async";
+import UserOperations from "../operations/userOperations.js";
 
 
 /* 
@@ -45,12 +46,14 @@ const insertOne = async (req, callback) => {
 						triggercallback(true, {
 							status: "error",
 							error: result,
+							message: "error occured while adding session"
 						});
 					}
 					else {
 						triggercallback(err, {
 							status: "ok",
 							data: result[0],
+							message: "session successfully added"
 						});
 					}
 				})
@@ -88,22 +91,55 @@ const find = async (req, callback) => {
 						triggercallback(true, {
 							status: "error",
 							error: result,
+							message: "error occured while fetching sessions"
 						});
 					}
 					else {
-						triggercallback(null, {
-							status: "ok",
-							data: result,
-						});
+						triggercallback(null, result);
 					}
 				})
+			},
+			function (data, triggercallback) {
+				let tempResult = data.map((value) => {
+					let temp = JSON.parse(JSON.stringify(value));
+					let criteria = { email: temp.email };
+					let projection = { _id: true, email: true, username: true, name: true };
+					const getUser = async (criteria, projection) => {
+						return new Promise((resolve, reject) => {
+							/* console.log(criteria); */
+							UserOperations.find(criteria, projection, (err, userData) => {
+								if (err) {
+									reject({
+										status: "error",
+										message: "error getting details",
+									})
+								}
+								else {
+									temp["creator"] = userData[0];
+									resolve(temp);
+								}
+							})
+						})
+					}
+					return getUser(criteria, projection);
+				});
+				/* console.log(tempResult) */
+				Promise.allSettled(tempResult)
+					.then((result) => {
+						/* console.log(result); */
+						triggercallback(null, {
+							status: "ok",
+							message: "sessions fetched successfully",
+							data: result,
+						});
+					});
+
 			}
 		],
 			function (err, result) {
 				callback(err, result);
 			}
 		)
-
 	}
 	else {
 		callback(true, {
@@ -123,12 +159,14 @@ const updateOne = async (req, callback) => {
 						triggercallback(true, {
 							status: "error",
 							error: result,
+							message: "error while updating"
 						})
 					}
 					else {
 						triggercallback(null, {
 							status: "ok",
 							data: result,
+							message: "successfully updated"
 						})
 					}
 				})
@@ -158,13 +196,15 @@ const deleteOne = async (req, callback) => {
 					if (err) {
 						triggercallback(true, {
 							status: "error",
-							error: result
+							error: result,
+							message: "error while deleting session"
 						})
 					}
 					else {
 						triggercallback(null, {
 							status: "ok",
 							data: result,
+							session: "successfully deleted",
 						})
 					}
 				})
