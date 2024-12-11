@@ -49,6 +49,43 @@ const find = async (req, callback) => {
 	}
 }
 
-const userUtils = { find };
+const deleteOne = async (req, callback) => {
+	const { body } = req;
+	if (body && body.email) {
+		let criteria = { email: body.email };
+		async.waterfall([
+			UserOperations.deleteMany(criteria, (err, result) => {
+				if (err) {
+					callback(true, {
+						status: "error",
+						error: result,
+						message: "error in removing the user"
+					})
+				}
+				else {
+					callback(null, {
+						status: "ok",
+						message: "successfully removed the user",
+						data: result,
+					})
+				}
+			})
+		],
+			function (err, result) {
+				callback(err, result);
+				return;
+			}
+		)
+	}
+	else {
+		callback(true, {
+			status: "error",
+			message: "error while removing the user",
+		})
+		return;
+	}
+}
+
+const userUtils = { find, deleteOne };
 
 export default userUtils;

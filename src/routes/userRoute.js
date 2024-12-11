@@ -1,8 +1,9 @@
 import express from "express";
-import { findUser } from "../controllers/userController.js";
+import userController from "../controllers/userController.js";
 
 const route = express.Router();
 
-route.post("/finduser", findUser);
+route.post("/finduser", userController.findUser);
+route.post("/deleteUser", userController.deleteUser);
 
 export default route;

@@ -13,4 +13,18 @@ const findUser = async (req, res) => {
 	})
 }
 
-export { findUser };
+/* 
+* @route - /user/deleteUser
+* @params - email of user to remove
+* @desc - user - controller - deleteUser
+*/
+
+const deleteUser = async (req, res) => {
+	userUtils.deleteOne(req, (err, result) => {
+		res.json(result);
+		return;
+	})
+}
+
+const userController = { findUser, deleteUser };
+export default userController;
