@@ -1,3 +1,5 @@
+import registrationOperations from "../operations/registrationOperations.js";
+import sessionOperations from "../operations/sessionOperations.js";
 import UserOperations from "../operations/userOperations.js";
 import async from "async";
 
@@ -26,13 +28,62 @@ const find = async (req, callback) => {
 
 					}
 					else {
-						triggercallback(null, {
-							status: "ok",
-							data: result
-						});
+						triggercallback(null, result);
 
 					}
 				})
+			},
+			function (data, triggercallback) {
+				try {
+					let updatedData = data.map((value) => {
+						let tempData = JSON.parse(JSON.stringify(value));
+						let criteria = { email: value.email };
+						let projection = { _id: true };
+						let fetchCount = async (criteria, projection) => {
+							return new Promise((resolve, reject) => {
+								sessionOperations.find(criteria, projection, (err, result) => {
+									if (err) {
+										reject(result);
+									}
+									else {
+										tempData["sessionCount"] = result.length;
+									}
+								})
+								registrationOperations.find(criteria, projection, (err, result) => {
+									if (err) {
+										reject(result);
+									}
+									else {
+										tempData["registerCount"] = result.length;
+										resolve(tempData);
+									}
+								})
+							})
+						}
+						return fetchCount(criteria, projection);
+					})
+					Promise.allSettled(updatedData)
+						.then((result) => {
+							triggercallback(null, {
+								status: "ok",
+								data: result,
+								message: "user fetched successfully"
+							})
+						})
+						.catch((err) => {
+							triggercallback(true, {
+								status: "error",
+								error: err,
+								message: "error while fetched successfully"
+							})
+						})
+				}
+				catch (err) {
+					triggercallback(true, {
+						status: "error",
+						error: err,
+					})
+				}
 			}
 
 		],
