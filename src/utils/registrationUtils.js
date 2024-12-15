@@ -51,6 +51,7 @@ const insertMany = async (req, callback) => {
 				})
 			},
 			function (data, triggercallback) {
+				/* console.log(registrationObj); */
 				registrationOperations.insertMany(registrationObj, (err, result) => {
 					if (err) {
 						triggercallback(true, {
@@ -61,7 +62,7 @@ const insertMany = async (req, callback) => {
 					else {
 						triggercallback(null, {
 							status: "ok",
-							data: result
+							data: result[0]
 						})
 					}
 				})

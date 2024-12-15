@@ -41,23 +41,42 @@ const find = async (req, callback) => {
 						let projection = { _id: true };
 						let fetchCount = async (criteria, projection) => {
 							return new Promise((resolve, reject) => {
-								sessionOperations.find(criteria, projection, (err, result) => {
-									if (err) {
-										reject(result);
+								async.waterfall([
+									function (nestedcallback) {
+										sessionOperations.find(criteria, projection, (err, result) => {
+											if (err) {
+												nestedcallback(true, { error: err });
+											}
+											else {
+												tempData["sessionCount"] = result.length;
+												nestedcallback(null, tempData);
+											}
+										})
+									},
+									function (data, nestedcallback) {
+										registrationOperations.find(criteria, projection, (err, result) => {
+											if (err) {
+												nestedcallback(true, { error: err });
+											}
+											else {
+												data["registerCount"] = result.length;
+												nestedcallback(null, data);
+											}
+										})
 									}
-									else {
-										tempData["sessionCount"] = result.length;
+								],
+									function (err, result) {
+										if (err) {
+											reject(result);
+										}
+										else {
+											resolve(result);
+										}
 									}
-								})
-								registrationOperations.find(criteria, projection, (err, result) => {
-									if (err) {
-										reject(result);
-									}
-									else {
-										tempData["registerCount"] = result.length;
-										resolve(tempData);
-									}
-								})
+								)
+
+
+
 							})
 						}
 						return fetchCount(criteria, projection);
