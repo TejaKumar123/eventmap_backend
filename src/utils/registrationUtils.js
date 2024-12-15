@@ -93,7 +93,7 @@ const deleteMany = async (req, callback) => {
 	const { body } = req;
 
 	if (body && body.registration_id) {
-		let criteria = { registration_id: body.registration_id };
+		let criteria = { registration_id: body.registration_id, ...body?.criteria };
 
 		async.waterfall([
 			function (triggercallback) {
