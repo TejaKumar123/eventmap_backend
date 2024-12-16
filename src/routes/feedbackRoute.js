@@ -5,7 +5,8 @@ const router = express.Router();
 
 router.use((req, res, next) => {
 	console.log("feedback middleware");
-	if (req.session.login == true) {
+	if (req?.session?.login == true && req?.session?.user?.email) {
+		req.body.email = req.session.user.email
 		next();
 	}
 	else {
