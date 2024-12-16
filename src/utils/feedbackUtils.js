@@ -95,9 +95,9 @@ const insertMany = async (req, callback) => {
 const updateMany = async (req, callback) => {
 	let { body } = req;
 
-	if (body && body.feedback_id && body.feedback) {
-		let criteria = { feedback_id: body.feedback_id };
-		let updatedInfo = { feedback: body.feedback };
+	if (body && Object.keys(body.criteria).length != 0 && Object.keys(body?.updatedInfo).length != 0) {
+		let criteria = body.criteria;
+		let updatedInfo = body.updatedInfo;
 
 		async.waterfall([
 			function (triggercallback) {
@@ -141,8 +141,8 @@ const updateMany = async (req, callback) => {
 const deleteMany = async (req, callback) => {
 	let { body } = req;
 
-	if (body && body.feedback_id) {
-		let criteria = { feedback_id: body.feedback_id };
+	if (body && Object.keys(body.criteria).length != 0) {
+		let criteria = body.criteria;
 		async.waterfall([
 			function (triggercallback) {
 				feedbackOperations.deleteMany(criteria, (err, result) => {
