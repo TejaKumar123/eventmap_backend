@@ -127,6 +127,7 @@ const deleteMany = async (req, callback) => {
 		let criteria = body.criteria;
 		async.waterfall([
 			function (triggercallback) {
+				//fetching the all sessions created by user.
 				let emailCriteria = criteria;
 				let projection = { _id: true, session_id: true, email: true };
 				/* console.log({ emailCriteria, projection }); */
@@ -138,31 +139,33 @@ const deleteMany = async (req, callback) => {
 						})
 					}
 					else {
-						triggercallback(true, result);
+						triggercallback(null, result);
 					}
 				})
 			},
 			function (data, triggercallback) {
+				//deleting all sessions feedbacks and registrations of user
 				let finalData = data.map((value) => {
 					let tempData = JSON.parse(JSON.stringify(value));
 					let deleteSession = async (tempData) => {
 						return new Promise((resolve, reject) => {
 							let criteria = { session_id: tempData.session_id };
-							console.log({ criteria: criteria });
-							/* sessionUtils.deleteMany(criteria, (err, result) => {
+							/* console.log({ criteria: criteria }); */
+							sessionUtils.deleteMany({ body: { criteria: criteria } }, (err, result) => {
 								if (err) {
-									resolve("ok");
+									reject("err");
 								}
 								else {
-									reject("error");
+									resolve("ok");
 								}
-							}) */
+							})
 						})
 					}
 					return deleteSession(tempData);
 				});
 				Promise.allSettled(finalData)
 					.then((res) => {
+						/* console.log({ res: res }) */
 						triggercallback(null, {});
 					})
 					.catch((err) => {
@@ -173,6 +176,7 @@ const deleteMany = async (req, callback) => {
 					})
 			},
 			function (data, triggercallback) {
+				//deleting the user registrations to the sessions
 				registrationOperations.deleteMany(criteria, (err, result) => {
 					if (err) {
 						triggercallback(true, {
@@ -186,6 +190,7 @@ const deleteMany = async (req, callback) => {
 				})
 			},
 			function (data, triggercallback) {
+				//deleting the user feedbacks given to the session.
 				feedbackOperations.deleteMany(criteria, (err, result) => {
 					if (err) {
 						triggercallback(true, {
