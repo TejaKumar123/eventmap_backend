@@ -20,7 +20,7 @@ const findUser = async (req, res) => {
 */
 
 const deleteUser = async (req, res) => {
-	userUtils.deleteOne(req, (err, result) => {
+	userUtils.deleteMany(req, (err, result) => {
 		res.json(result);
 		return;
 	})

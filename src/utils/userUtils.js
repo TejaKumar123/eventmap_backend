@@ -1,3 +1,4 @@
+import feedbackOperations from "../operations/feedbackOperations.js";
 import registrationOperations from "../operations/registrationOperations.js";
 import sessionOperations from "../operations/sessionOperations.js";
 import UserOperations from "../operations/userOperations.js";
@@ -119,27 +120,68 @@ const find = async (req, callback) => {
 	}
 }
 
-const deleteOne = async (req, callback) => {
+const deleteMany = async (req, callback) => {
 	const { body } = req;
-	if (body && body.email) {
-		let criteria = { email: body.email };
+	if (body && Object.keys(body.criteria).length != 0) {
+		let criteria = body.criteria;
 		async.waterfall([
-			UserOperations.deleteMany(criteria, (err, result) => {
-				if (err) {
-					callback(true, {
-						status: "error",
-						error: result,
-						message: "error in removing the user"
-					})
-				}
-				else {
-					callback(null, {
-						status: "ok",
-						message: "successfully removed the user",
-						data: result,
-					})
-				}
-			})
+			function (triggercallback) {
+				sessionOperations.deleteMany(criteria, (err, result) => {
+					if (err) {
+						triggercallback(true, {
+							status: "error",
+							message: "error occur while removing user sessions. Please try again"
+						})
+					}
+					else {
+						triggercallback(null, {});
+					}
+				})
+			},
+			function (triggercallback) {
+				registrationOperations.deleteMany(criteria, (err, result) => {
+					if (err) {
+						triggercallback(true, {
+							status: "error",
+							message: "error occur while removing user registrations. Please try again"
+						})
+					}
+					else {
+						triggercallback(null, {});
+					}
+				})
+			},
+			function (triggercallback) {
+				feedbackOperations.deleteMany(criteria, (err, result) => {
+					if (err) {
+						triggercallback(true, {
+							status: "error",
+							message: "error occur while removing user feedbacks. Please try again"
+						})
+					}
+					else {
+						triggercallback(null, {});
+					}
+				})
+			},
+			function (data, triggercallback) {
+				UserOperations.deleteMany(criteria, (err, result) => {
+					if (err) {
+						triggercallback(true, {
+							status: "error",
+							error: result,
+							message: "error in removing the user"
+						})
+					}
+					else {
+						triggercallback(null, {
+							status: "ok",
+							message: "successfully removed the user",
+							data: result,
+						})
+					}
+				})
+			}
 		],
 			function (err, result) {
 				callback(err, result);
@@ -156,6 +198,6 @@ const deleteOne = async (req, callback) => {
 	}
 }
 
-const userUtils = { find, deleteOne };
+const userUtils = { find, deleteMany };
 
 export default userUtils;
