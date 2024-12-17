@@ -3,6 +3,7 @@ import registrationOperations from "../operations/registrationOperations.js";
 import sessionOperations from "../operations/sessionOperations.js";
 import UserOperations from "../operations/userOperations.js";
 import async from "async";
+import sessionUtils from "./sessionUtils.js";
 
 /* 
 * @route - /user/findUser
@@ -122,11 +123,14 @@ const find = async (req, callback) => {
 
 const deleteMany = async (req, callback) => {
 	const { body } = req;
-	if (body && Object.keys(body.criteria).length != 0) {
+	if (body && Object.keys(body.criteria).length != 0 && body.criteria.email) {
 		let criteria = body.criteria;
 		async.waterfall([
 			function (triggercallback) {
-				sessionOperations.deleteMany(criteria, (err, result) => {
+				let emailCriteria = criteria;
+				let projection = { _id: true, session_id: true, email: true };
+				/* console.log({ emailCriteria, projection }); */
+				sessionOperations.find(emailCriteria, projection, (err, result) => {
 					if (err) {
 						triggercallback(true, {
 							status: "error",
@@ -134,11 +138,41 @@ const deleteMany = async (req, callback) => {
 						})
 					}
 					else {
-						triggercallback(null, {});
+						triggercallback(true, result);
 					}
 				})
 			},
-			function (triggercallback) {
+			function (data, triggercallback) {
+				let finalData = data.map((value) => {
+					let tempData = JSON.parse(JSON.stringify(value));
+					let deleteSession = async (tempData) => {
+						return new Promise((resolve, reject) => {
+							let criteria = { session_id: tempData.session_id };
+							console.log({ criteria: criteria });
+							/* sessionUtils.deleteMany(criteria, (err, result) => {
+								if (err) {
+									resolve("ok");
+								}
+								else {
+									reject("error");
+								}
+							}) */
+						})
+					}
+					return deleteSession(tempData);
+				});
+				Promise.allSettled(finalData)
+					.then((res) => {
+						triggercallback(null, {});
+					})
+					.catch((err) => {
+						triggercallback(true, {
+							status: "error",
+							message: "error while removing user sessions",
+						})
+					})
+			},
+			function (data, triggercallback) {
 				registrationOperations.deleteMany(criteria, (err, result) => {
 					if (err) {
 						triggercallback(true, {
@@ -151,7 +185,7 @@ const deleteMany = async (req, callback) => {
 					}
 				})
 			},
-			function (triggercallback) {
+			function (data, triggercallback) {
 				feedbackOperations.deleteMany(criteria, (err, result) => {
 					if (err) {
 						triggercallback(true, {
