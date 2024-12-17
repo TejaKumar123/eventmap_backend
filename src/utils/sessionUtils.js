@@ -3,6 +3,8 @@ import { ObjectId } from "mongodb";
 import sessionOperations from "../operations/sessionOperations.js";
 import async from "async";
 import UserOperations from "../operations/userOperations.js";
+import feedbackOperations from "../operations/feedbackOperations.js";
+import registrationOperations from "../operations/registrationOperations.js";
 
 
 /* 
@@ -192,6 +194,35 @@ const deleteMany = async (req, callback) => {
 		let criteria = body.criteria;
 		async.waterfall([
 			function (triggercallback) {
+				//deleting session feedbacks
+				feedbackOperations.deleteMany(criteria, (err, result) => {
+					if (err) {
+						triggercallback(true, {
+							status: "error",
+							messsage: "error while removing session feedbacks. Try to delete again",
+						})
+					}
+					else {
+						triggercallback(null, {})
+					}
+				})
+			},
+			function (data, triggercallback) {
+				//deleting session registrations
+				registrationOperations.deleteMany(criteria, (err, result) => {
+					if (err) {
+						triggercallback(true, {
+							status: "error",
+							messsage: "error while removing session registrations. Try to delete again",
+						})
+					}
+					else {
+						triggercallback(null, {})
+					}
+				})
+			},
+			function (data, triggercallback) {
+				//deleting session finally
 				sessionOperations.deleteMany(criteria, (err, result) => {
 					if (err) {
 						triggercallback(true, {
