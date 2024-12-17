@@ -185,14 +185,14 @@ const updateOne = async (req, callback) => {
 	}
 }
 
-const deleteOne = async (req, callback) => {
+const deleteMany = async (req, callback) => {
 	const { body } = req;
 
-	if (body && body.session_id) {
-		let criteria = { session_id: body.session_id, ...body.criteria };
+	if (body && Object.keys(body.criteria).length != 0) {
+		let criteria = body.criteria;
 		async.waterfall([
 			function (triggercallback) {
-				sessionOperations.deleteOne(criteria, (err, result) => {
+				sessionOperations.deleteMany(criteria, (err, result) => {
 					if (err) {
 						triggercallback(true, {
 							status: "error",
@@ -223,6 +223,6 @@ const deleteOne = async (req, callback) => {
 	}
 }
 
-const sessionUtils = { insertOne, find, updateOne, deleteOne };
+const sessionUtils = { insertOne, find, updateOne, deleteMany };
 
 export default sessionUtils;

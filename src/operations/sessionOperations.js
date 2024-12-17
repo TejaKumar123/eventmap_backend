@@ -35,7 +35,7 @@ const find = async (criteria, projection, callback) => {
 	}
 }
 
-const deleteOne = async (criteria, callback) => {
+const deleteMany = async (criteria, callback) => {
 	try {
 		let res = await Session.deleteOne(criteria);
 		callback(null, res);
@@ -46,6 +46,6 @@ const deleteOne = async (criteria, callback) => {
 	}
 }
 
-const sessionOperations = { insertOne, updateOne, find, deleteOne };
+const sessionOperations = { insertOne, updateOne, find, deleteMany };
 
 export default sessionOperations;

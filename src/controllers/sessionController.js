@@ -29,7 +29,7 @@ const session_update = (req, res) => {
 */
 
 const session_delete = (req, res) => {
-	sessionUtils.deleteOne(req, (err, result) => {
+	sessionUtils.deleteMany(req, (err, result) => {
 		res.json(result);
 	})
 }
